@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <h1>Admin Panel</h1>
+    <button onclick="logout()">Logout</button>
+
+    <h2>Add Product</h2>
+    <input type="text" id="name" placeholder="Product Name">
+    <input type="text" id="description" placeholder="Product Description">
+    <input type="number" id="price" placeholder="Price">
+    <input type="number" id="quantity" placeholder="Stock Quantity">
+    <input type="date" id="expiry" placeholder="Expiry Date">
+    <button onclick="addProduct()">Add Product</button>
+
+    <h2>Product List</h2>
+    <div id="product-list"></div>
+
+    <h2>Orders</h2>
+    <div id="order-list"></div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
