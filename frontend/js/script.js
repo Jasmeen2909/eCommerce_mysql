@@ -1,6 +1,6 @@
 const API_URL = "http://localhost:3000/api";
 
-// ✅ Admin Login
+// Admin Login
 async function adminLogin() {
     const email = document.getElementById("adminEmail").value;
     const password = document.getElementById("adminPassword").value;
@@ -64,7 +64,7 @@ async function login() {
     if (response.ok) {
         localStorage.setItem("user_id", result.user.id);
         alert("Login successful!");
-        window.location.href = "index.html"; // Redirect to homepage
+        window.location.href = "index.html"; 
     } else {
         alert(`Error: ${result.message}`);
     }
@@ -83,7 +83,6 @@ async function fetchProducts() {
             <div class="product">
                 <h3>${product.name}</h3>
                 <p>Price: ₹${product.price}</p>
-                <p>Stock: ${product.quantity}</p>
                 <button onclick="addToCart(${product.id})">Add to Cart</button>
             </div>
         `;
@@ -102,7 +101,6 @@ async function addToCart(productId) {
     }
 
     const cartData = { user_id: userId, product_id: productId, quantity: 1 };
-    console.log("Sending Cart Data:", cartData); // ✅ Debugging log
 
     let response = await fetch("http://localhost:3000/api/cart", {
         method: "POST",
@@ -111,18 +109,19 @@ async function addToCart(productId) {
     });
 
     let result = await response.json();
-    
+
     if (response.ok) {
-        alert("Item added to cart!");
-        fetchCart(); // ✅ Refresh cart items after adding
+        alert("Cart updated successfully!");
+        fetchCart(); // Refresh cart after adding
     } else {
         alert(`Error: ${result.message}`);
     }
 }
 
+
 async function fetchCart() {
     const userId = localStorage.getItem("user_id");
-    
+
     if (!userId) {
         alert("Please login first.");
         window.location.href = "login.html";
@@ -144,12 +143,57 @@ async function fetchCart() {
         cartContainer.innerHTML += `
             <div class="cart-item">
                 <h3>${item.name}</h3>
-                <p>Quantity: ${item.quantity}</p>
+                <p>Quantity: <button onclick="updateCart(${item.product_id}, ${item.quantity - 1})">-</button> 
+                ${item.quantity} 
+                <button onclick="updateCart(${item.product_id}, ${item.quantity + 1})">+</button></p>
                 <p>Expires on: ${item.expiry_date}</p>
+                <button onclick="removeFromCart(${item.product_id})">Remove</button>
             </div>
         `;
     });
 }
+
+// ✅ Update Cart Quantity
+async function updateCart(productId, newQuantity) {
+    if (newQuantity < 1) {
+        removeFromCart(productId);
+        return;
+    }
+
+    const userId = localStorage.getItem("user_id");
+    let response = await fetch("http://localhost:3000/api/cart/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, product_id: productId, quantity: newQuantity })
+    });
+
+    let result = await response.json();
+    
+    if (response.ok) {
+        fetchCart(); // ✅ Refresh cart after update
+    } else {
+        alert(`Error: ${result.message}`);
+    }
+}
+
+// ✅ Remove Item from Cart
+async function removeFromCart(productId) {
+    const userId = localStorage.getItem("user_id");
+    let response = await fetch("http://localhost:3000/api/cart/remove", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, product_id: productId })
+    });
+
+    let result = await response.json();
+    
+    if (response.ok) {
+        fetchCart(); // ✅ Refresh cart after removal
+    } else {
+        alert(`Error: ${result.message}`);
+    }
+}
+
 
 
 fetchProducts();
