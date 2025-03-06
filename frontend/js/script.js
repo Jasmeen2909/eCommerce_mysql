@@ -70,6 +70,20 @@ async function login() {
     }
 }
 
+function showToast(message, type = "info") {
+    const toastContainer = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = "fadeOut 0.5s forwards";
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
 
 // Fetch and Display Products
 async function fetchProducts() {
@@ -95,12 +109,13 @@ async function addToCart(productId) {
     const userId = localStorage.getItem("user_id");
 
     if (!userId) {
-        alert("Please login first.");
+        showToast("Please login first.", "error");
         window.location.href = "login.html";
         return;
     }
 
     const cartData = { user_id: userId, product_id: productId, quantity: 1 };
+
 
     let response = await fetch("http://localhost:3000/api/cart", {
         method: "POST",
@@ -111,10 +126,10 @@ async function addToCart(productId) {
     let result = await response.json();
 
     if (response.ok) {
-        alert("Cart updated successfully!");
+        showToast("Item added to cart!", "success");
         fetchCart(); // Refresh cart after adding
     } else {
-        alert(`Error: ${result.message}`);
+        showToast(result.message, "error");
     }
 }
 
@@ -146,14 +161,13 @@ async function fetchCart() {
                 <p>Quantity: <button onclick="updateCart(${item.product_id}, ${item.quantity - 1})">-</button> 
                 ${item.quantity} 
                 <button onclick="updateCart(${item.product_id}, ${item.quantity + 1})">+</button></p>
-                <p>Expires on: ${item.expiry_date}</p>
                 <button onclick="removeFromCart(${item.product_id})">Remove</button>
             </div>
         `;
     });
 }
 
-// ✅ Update Cart Quantity
+// Update Cart Quantity
 async function updateCart(productId, newQuantity) {
     if (newQuantity < 1) {
         removeFromCart(productId);
@@ -161,6 +175,7 @@ async function updateCart(productId, newQuantity) {
     }
 
     const userId = localStorage.getItem("user_id");
+
     let response = await fetch("http://localhost:3000/api/cart/update", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -168,17 +183,20 @@ async function updateCart(productId, newQuantity) {
     });
 
     let result = await response.json();
-    
+
     if (response.ok) {
-        fetchCart(); // ✅ Refresh cart after update
+        showToast("Cart updated!", "success");
+        fetchCart(); // Refresh cart after update
     } else {
-        alert(`Error: ${result.message}`);
+        showToast(result.message, "error");
     }
 }
 
-// ✅ Remove Item from Cart
+
+// Remove Item from Cart
 async function removeFromCart(productId) {
     const userId = localStorage.getItem("user_id");
+
     let response = await fetch("http://localhost:3000/api/cart/remove", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -186,15 +204,14 @@ async function removeFromCart(productId) {
     });
 
     let result = await response.json();
-    
+
     if (response.ok) {
-        fetchCart(); // ✅ Refresh cart after removal
+        showToast("Item removed from cart", "success");
+        fetchCart(); // Refresh cart after removal
     } else {
-        alert(`Error: ${result.message}`);
+        showToast(result.message, "error");
     }
 }
-
-
 
 fetchProducts();
 

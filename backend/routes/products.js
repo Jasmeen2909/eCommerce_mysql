@@ -25,4 +25,35 @@ router.post("/add", (req, res) => {
     });
 });
 
+router.delete("/delete/:product_id", (req, res) => {
+    const productId = req.params.product_id;
+
+    // Delete product from database
+    db.query("DELETE FROM products WHERE id = ?", [productId], (err, result) => {
+        if (err) {
+            console.error("Error deleting product:", err);
+            return res.status(500).json({ message: "Error deleting product" });
+        }
+        res.json({ message: "Product deleted successfully!" });
+    });
+});
+
+router.put("/edit/:product_id", (req, res) => {
+    const productId = req.params.product_id;
+    const { name, price, quantity, expiry_duration } = req.body;
+
+    db.query(
+        "UPDATE products SET name = ?, price = ?, quantity = ?, expiry_duration = ? WHERE id = ?",
+        [name, price, quantity, expiry_duration, productId],
+        (err, result) => {
+            if (err) {
+                console.error("Error updating product:", err);
+                return res.status(500).json({ message: "Error updating product" });
+            }
+            res.json({ message: "Product updated successfully!" });
+        }
+    );
+});
+
+
 module.exports = router;

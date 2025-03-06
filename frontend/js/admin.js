@@ -48,25 +48,32 @@ async function fetchProducts() {
     });
 }
 
-// ✅ Fetch Orders
+// Fetch Orders
 async function fetchOrders() {
-    let response = await fetch(`${API_URL}/orders`);
+    let response = await fetch(`${API_URL}/orders/all`);
     let orders = await response.json();
-    let orderList = document.getElementById("order-list");
-    orderList.innerHTML = "";
+
+    let ordersContainer = document.getElementById("orders-list");
+    ordersContainer.innerHTML = "";
+
+    if (orders.length === 0) {
+        ordersContainer.innerHTML = "<p>No orders found.</p>";
+        return;
+    }
 
     orders.forEach(order => {
-        orderList.innerHTML += `
+        ordersContainer.innerHTML += `
             <div class="order">
-                <h3>Order #${order.id}</h3>
-                <p>User ID: ${order.user_id}</p>
-                <p>Total Amount: ₹${order.total_amount}</p>
+                <h3>Order #${order.order_id} - ₹${order.total_amount}</h3>
                 <p>Status: ${order.status}</p>
-                <button onclick="completeOrder(${order.id})">Mark as Completed</button>
+                <p>Items: ${order.items}</p>
             </div>
         `;
     });
 }
+
+fetchOrders();
+
 
 //  Mark Order as Completed
 async function completeOrder(orderId) {

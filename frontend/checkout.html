@@ -10,8 +10,15 @@
 
     <h1>Checkout</h1>
     <div id="cart-summary"></div>
-    <button onclick="window.location.href='index.html'">Back to Store</button>
-    <button onclick="placeOrder()">Place Order</button>
+
+    <h2>Order Summary</h2>
+    <p>Subtotal: ₹<span id="subtotal">0</span></p>
+    <p>Tax (10%): ₹<span id="tax">0</span></p>
+    <p>Delivery Charges: ₹<span id="delivery">50</span></p>
+    <h3>Total Payable: ₹<span id="total">0</span></h3>
+
+    <button onclick="placeOrder()">Confirm Order</button>
+    <button onclick="window.location.href='cart.html'">Back to Cart</button>
 
     <script src="js/checkout.js"></script>
 </body>
