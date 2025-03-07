@@ -28,8 +28,6 @@ router.post("/checkout/:userId", (req, res) => {
         let taxAmount = subtotal * taxRate;
         let totalAmount = subtotal + taxAmount + deliveryCharge;
 
-        console.log(`Subtotal: ${subtotal}, Tax: ${taxAmount}, Total Amount: ${totalAmount}`);
-
         db.query(`INSERT INTO orders (user_id, subtotal, total_amount, tax, delivery_charge) VALUES (?, ?, ?, ?, ?)`, 
                 [userId, subtotal, totalAmount, taxAmount, deliveryCharge], (err, result) => {
 

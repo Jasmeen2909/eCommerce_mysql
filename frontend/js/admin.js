@@ -8,11 +8,15 @@ if (!localStorage.getItem("admin_token")) {
 
 // ✅ Add Product
 async function addProduct() {
-    const name = document.getElementById("name").value;
-    const description = document.getElementById("description").value;
-    const price = document.getElementById("price").value;
-    const quantity = document.getElementById("quantity").value;
-    const expiry = document.getElementById("expiry").value;
+    const name = document.getElementById("name").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const price = document.getElementById("price").value.trim();
+    const quantity = document.getElementById("quantity").value.trim();
+
+    if (!name || !description || !price || !quantity) {
+        showToast("All fields are required!", "error");
+        return;
+    }
 
     let response = await fetch(`${API_URL}/products/add`, {
         method: "POST",
@@ -20,11 +24,11 @@ async function addProduct() {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("admin_token")}` 
         },
-        body: JSON.stringify({ name, description, price, quantity, expiry_date: expiry })
+        body: JSON.stringify({ name, description, price, quantity })
     });
 
     let result = await response.json();
-    alert(result.message);
+    showToast(result.message, response.ok ? "success" : "error");
     fetchProducts();  // Refresh product list
 }
 
@@ -42,13 +46,67 @@ async function fetchProducts() {
                 <p>${product.description}</p>
                 <p>Price: ₹${product.price}</p>
                 <p>Stock: ${product.quantity}</p>
-                <p>Expires: ${product.expiry_date}</p>
+                <button onclick="openEditProduct(${product.id}, '${product.name}', '${product.description}', ${product.price}, ${product.quantity})">Edit</button>
+                <button onclick="deleteProduct(${product.id})">Delete</button>
             </div>
         `;
     });
 }
 
-// Fetch Orders
+// ✅ Open Edit Product Modal
+function openEditProduct(id, name, description, price, quantity) {
+    document.getElementById("editProductId").value = id;
+    document.getElementById("editName").value = name;
+    document.getElementById("editDesc").value = description;
+    document.getElementById("editPrice").value = price;
+    document.getElementById("editQuantity").value = quantity;
+
+    document.getElementById("editProductModal").style.display = "flex";
+}
+
+// ✅ Close Modal
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+// ✅ Save Edited Product
+async function saveEditedProduct() {
+    const id = document.getElementById("editProductId").value;
+    const name = document.getElementById("editName").value;
+    const description = document.getElementById("editDesc").value;
+    const price = document.getElementById("editPrice").value;
+    const quantity = document.getElementById("editQuantity").value;
+
+    let response = await fetch(`${API_URL}/products/edit/${id}`, {
+        method: "PUT",
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("admin_token")}` 
+        },
+        body: JSON.stringify({ name, description, price, quantity })
+    });
+
+    let result = await response.json();
+    showToast(result.message, response.ok ? "success" : "error");
+    closeModal("editProductModal");
+    fetchProducts(); // Refresh product list
+}
+
+// ✅ Delete Product
+async function deleteProduct(productId) {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    let response = await fetch(`${API_URL}/products/delete/${productId}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token")}` }
+    });
+
+    let result = await response.json();
+    showToast(result.message, response.ok ? "success" : "error");
+    fetchProducts(); // Refresh product list
+}
+
+// ✅ Fetch Orders for Admin Panel
 async function fetchOrders() {
     let response = await fetch(`${API_URL}/orders/all`);
     let orders = await response.json();
@@ -67,29 +125,50 @@ async function fetchOrders() {
                 <h3>Order #${order.order_id} - ₹${order.total_amount}</h3>
                 <p>Status: ${order.status}</p>
                 <p>Items: ${order.items}</p>
+                ${order.status === "pending" ? `<button onclick="completeOrder(${order.order_id})">Mark as Completed</button>` : ""}
             </div>
         `;
     });
 }
 
-fetchOrders();
-
-
-//  Mark Order as Completed
+// ✅ Mark Order as Completed
 async function completeOrder(orderId) {
-    await fetch(`${API_URL}/orders/complete/${orderId}`, { 
+    let response = await fetch(`${API_URL}/orders/complete/${orderId}`, { 
         method: "PUT",
         headers: { "Authorization": `Bearer ${localStorage.getItem("admin_token")}` }
     });
 
+    let result = await response.json();
+    showToast(result.message, response.ok ? "success" : "error");
     fetchOrders(); // Refresh orders list
 }
 
-//  Logout
+// ✅ Logout
 function logout() {
     localStorage.removeItem("admin_token");
     window.location.href = "login.html";
 }
 
+// ✅ Toast Notification Function
+function showToast(message, type = "info") {
+    const toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        console.error("Toast container not found!");
+        return;
+    }
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = "fadeOut 0.5s forwards";
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// ✅ Initial Data Load
 fetchProducts();
 fetchOrders();

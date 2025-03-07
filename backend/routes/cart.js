@@ -110,17 +110,21 @@ router.post("/", (req, res) => {
 });
 
 // Auto-remove expired products from cart
-router.get("/cleanup", (req, res) => {
-    const now = new Date();
-    
-    db.query("DELETE FROM cart WHERE product_id IN (SELECT id FROM products WHERE expiry_date < NOW())", (err, result) => {
-        if (err) {
-            console.error("Error removing expired products:", err);
-            return res.status(500).json({ message: "Error cleaning cart" });
-        }
-        res.json({ message: "Expired products removed from cart!" });
-    });
-});
+// router.get("/cleanup", (req, res) => {
+//     db.query(`
+//         DELETE FROM cart 
+//         WHERE product_id IN (
+//             SELECT id FROM products WHERE TIMESTAMPDIFF(MINUTE, created_at, NOW()) >= expiry_duration
+//         )`, 
+//     (err, result) => {
+//         if (err) {
+//             console.error("Error removing expired products:", err);
+//             return res.status(500).json({ message: "Error cleaning cart" });
+//         }
+//         res.json({ message: "Expired products removed from cart!" });
+//     });
+// });
+
 
 
 module.exports = router;

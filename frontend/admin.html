@@ -16,7 +16,8 @@
     <input type="text" id="description" placeholder="Product Description">
     <input type="number" id="price" placeholder="Price">
     <input type="number" id="quantity" placeholder="Stock Quantity">
-    <input type="date" id="expiry" placeholder="Expiry Date">
+    <!-- <input type="number" id="expiry" min="1" placeholder="Enter expiry duration"> -->
+
     <button onclick="addProduct()">Add Product</button>
 
     <h2>Product List</h2>
@@ -24,6 +25,26 @@
 
     <h2>Orders</h2>
     <div id="order-list"></div>
+
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Product</h2>
+            <input type="hidden" id="editProductId">
+            <label>Product Name:</label>
+            <input type="text" id="editName">
+            <label>Product description:</label>
+            <input type="text" id="editDesc">
+            <label>Price:</label>
+            <input type="number" id="editPrice">
+            <label>Stock Quantity:</label>
+            <input type="number" id="editQuantity">
+            <!-- <label>Expiry Date:</label>
+            <input type="datetime-local" id="editExpiry"> -->
+            <button onclick="saveEditedProduct()">Update</button>
+            <button onclick="closeModal('editProductModal')">Cancel</button>
+        </div>
+    </div>
+    <div id="toast-container"></div>
 
     <script src="js/admin.js"></script>
 </body>
