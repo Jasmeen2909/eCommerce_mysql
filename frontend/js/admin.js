@@ -1,12 +1,12 @@
 const API_URL = "http://localhost:3000/api";
 
-// ✅ Check if Admin is Logged In
+// Check if Admin is Logged In
 if (!localStorage.getItem("admin_token")) {
     alert("Unauthorized Access! Please log in as Admin.");
     window.location.href = "login.html";
 }
 
-// ✅ Add Product
+// Add Product
 async function addProduct() {
     const name = document.getElementById("name").value.trim();
     const description = document.getElementById("description").value.trim();
@@ -32,7 +32,7 @@ async function addProduct() {
     fetchProducts();  // Refresh product list
 }
 
-// ✅ Fetch Products
+// Fetch Products
 async function fetchProducts() {
     let response = await fetch(`${API_URL}/products`);
     let products = await response.json();
@@ -53,7 +53,7 @@ async function fetchProducts() {
     });
 }
 
-// ✅ Open Edit Product Modal
+// Open Edit Product Modal
 function openEditProduct(id, name, description, price, quantity) {
     document.getElementById("editProductId").value = id;
     document.getElementById("editName").value = name;
@@ -64,12 +64,12 @@ function openEditProduct(id, name, description, price, quantity) {
     document.getElementById("editProductModal").style.display = "flex";
 }
 
-// ✅ Close Modal
+// Close Modal
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = "none";
 }
 
-// ✅ Save Edited Product
+// Save Edited Product
 async function saveEditedProduct() {
     const id = document.getElementById("editProductId").value;
     const name = document.getElementById("editName").value;
@@ -92,7 +92,7 @@ async function saveEditedProduct() {
     fetchProducts(); // Refresh product list
 }
 
-// ✅ Delete Product
+// Delete Product
 async function deleteProduct(productId) {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
@@ -106,32 +106,44 @@ async function deleteProduct(productId) {
     fetchProducts(); // Refresh product list
 }
 
-// ✅ Fetch Orders for Admin Panel
+// Fetch Orders for Admin Panel
 async function fetchOrders() {
     let response = await fetch(`${API_URL}/orders/all`);
     let orders = await response.json();
 
     let ordersContainer = document.getElementById("orders-list");
+
+    if (!ordersContainer) {
+        console.error("Error: #orders-list element not found!");
+        return;
+    }
+
     ordersContainer.innerHTML = "";
 
-    if (orders.length === 0) {
+    if (!orders || orders.length === 0) {
         ordersContainer.innerHTML = "<p>No orders found.</p>";
         return;
     }
 
     orders.forEach(order => {
-        ordersContainer.innerHTML += `
-            <div class="order">
-                <h3>Order #${order.order_id} - ₹${order.total_amount}</h3>
-                <p>Status: ${order.status}</p>
-                <p>Items: ${order.items}</p>
-                ${order.status === "pending" ? `<button onclick="completeOrder(${order.order_id})">Mark as Completed</button>` : ""}
-            </div>
+        let itemsText = order.items ? order.items : "No items";
+
+        let orderElement = document.createElement("div");
+        orderElement.classList.add("order");
+        orderElement.innerHTML = `
+            <h3>Order #${order.order_id} - ₹${order.total_amount}</h3>
+            <p><strong>User ID:</strong> ${order.user_id}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+            <p><strong>Order Date:</strong> ${new Date(order.order_date).toLocaleString()}</p>
+            <p><strong>Items:</strong> ${itemsText}</p>
+            ${order.status === "pending" ? `<button onclick="completeOrder(${order.order_id})">Mark as Completed</button>` : ""}
         `;
+
+        ordersContainer.appendChild(orderElement);
     });
 }
 
-// ✅ Mark Order as Completed
+// Mark Order as Completed
 async function completeOrder(orderId) {
     let response = await fetch(`${API_URL}/orders/complete/${orderId}`, { 
         method: "PUT",
@@ -143,13 +155,13 @@ async function completeOrder(orderId) {
     fetchOrders(); // Refresh orders list
 }
 
-// ✅ Logout
+// Logout
 function logout() {
     localStorage.removeItem("admin_token");
     window.location.href = "login.html";
 }
 
-// ✅ Toast Notification Function
+// Toast Notification Function
 function showToast(message, type = "info") {
     const toastContainer = document.getElementById("toast-container");
     if (!toastContainer) {
@@ -169,6 +181,6 @@ function showToast(message, type = "info") {
     }, 3000);
 }
 
-// ✅ Initial Data Load
+// Initial Data Load
 fetchProducts();
 fetchOrders();

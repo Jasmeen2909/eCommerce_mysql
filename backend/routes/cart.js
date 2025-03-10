@@ -48,10 +48,10 @@ router.get("/:user_id", (req, res) => {
     const userId = req.params.user_id;
 
     const sql = `
-        SELECT cart.id, cart.product_id, products.name, cart.quantity, products.price, products.expiry_date 
+        SELECT cart.id, cart.product_id, products.name, cart.quantity, products.price
         FROM cart 
         JOIN products ON cart.product_id = products.id 
-        WHERE cart.user_id = ? AND products.expiry_date >= CURDATE()
+        WHERE cart.user_id = ?
     `;
 
     db.query(sql, [userId], (err, result) => {

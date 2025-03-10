@@ -59,7 +59,7 @@ async function placeOrder() {
     let result = await response.json();
     
     if (response.ok) {
-        showToast(result.message, "success"); // ✅ Ensure showToast() is available
+        showToast(result.message, "success");
         window.location.href = `invoice.html?orderId=${result.invoice_id}`;
     } else {
         console.error("Checkout Error:", result);
@@ -67,7 +67,7 @@ async function placeOrder() {
     }
 }
 
-// ✅ Add showToast function to `checkout.js`
+// Add showToast function to `checkout.js`
 function showToast(message, type = "info") {
     const toastContainer = document.getElementById("toast-container");
     if (!toastContainer) {
@@ -87,7 +87,4 @@ function showToast(message, type = "info") {
     }, 3000);
 }
 
-
-
-// Load cart summary when checkout page loads
 fetchCartSummary();

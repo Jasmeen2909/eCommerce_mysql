@@ -3,13 +3,13 @@ const db = require("../db");
 
 const router = express.Router();
 
-// ✅ Checkout (Place Order with Tax & Delivery)
+// Checkout (Place Order with Tax & Delivery)
 router.post("/checkout/:userId", (req, res) => {
     const userId = req.params.userId;
     const taxRate = 0.10;
     const deliveryCharge = 50;
 
-    db.query(`SELECT c.product_id, c.quantity, p.price, p.name, p.expiry_date FROM cart c 
+    db.query(`SELECT c.product_id, c.quantity, p.price, p.name FROM cart c 
               JOIN products p ON c.product_id = p.id WHERE c.user_id = ?`, 
               [userId], (err, cartItems) => {
 
@@ -18,7 +18,7 @@ router.post("/checkout/:userId", (req, res) => {
             return res.status(500).json({ message: "Error fetching cart", error: err });
         }
 
-        // ✅ Prevent orders with expired items
+        // Prevent orders with expired items
         const expiredItems = cartItems.filter(item => new Date(item.expiry_date) < new Date());
         if (expiredItems.length > 0) {
             return res.status(400).json({ message: "Some products have expired and cannot be ordered." });
@@ -61,7 +61,7 @@ router.post("/checkout/:userId", (req, res) => {
 });
 
 
-// ✅ Get Invoice Details by Order ID
+// Get Invoice Details by Order ID
 router.get("/invoice/:orderId", (req, res) => {
     const orderId = req.params.orderId;
 
@@ -99,13 +99,16 @@ router.get("/invoice/:orderId", (req, res) => {
 });
 
 router.get("/all", (req, res) => {
-    db.query(`SELECT o.id AS order_id, o.user_id, o.total_amount, o.status, o.order_date, 
-                     GROUP_CONCAT(oi.name, ' (x', oi.quantity, ')') AS items 
-              FROM orders o 
-              JOIN order_items oi ON o.id = oi.order_id 
-              GROUP BY o.id 
-              ORDER BY o.order_date DESC`, 
-    (err, result) => {
+    const sql = `
+        SELECT o.id AS order_id, o.user_id, o.total_amount, o.status, o.order_date, 
+               GROUP_CONCAT(CONCAT(oi.name, ' (x', oi.quantity, ')')) AS items
+        FROM orders o 
+        JOIN order_items oi ON o.id = oi.order_id 
+        GROUP BY o.id 
+        ORDER BY o.order_date DESC
+    `;
+
+    db.query(sql, (err, result) => {
         if (err) {
             console.error("Error fetching orders:", err);
             return res.status(500).json({ message: "Error fetching orders" });
@@ -113,6 +116,27 @@ router.get("/all", (req, res) => {
         res.json(result);
     });
 });
+
+router.put("/complete/:orderId", (req, res) => {
+    const orderId = req.params.orderId;
+
+    const sql = "UPDATE orders SET status = 'completed' WHERE id = ?";
+
+    db.query(sql, [orderId], (err, result) => {
+        if (err) {
+            console.error("Database Error:", err);
+            return res.status(500).json({ message: "Error updating order", error: err });
+        }
+
+        if (result.affectedRows === 0) {
+            console.warn("Order Not Found:", { orderId });
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        res.json({ message: "Order marked as completed!" });
+    });
+});
+
 
 
 module.exports = router;

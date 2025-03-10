@@ -85,3 +85,39 @@ button {
     border: none;
     cursor: pointer;
 }
+
+#orders-container {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+.orders-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 90%;
+}
+.order {
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 250px;
+    max-width: 300px;
+    text-align: center;
+}
+.order h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+.order p {
+    font-size: 14px;
+    margin: 10px 0;
+}
+.order button {
+    background-color: blue;
+    color: white;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+}

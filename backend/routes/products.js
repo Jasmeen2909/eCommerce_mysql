@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
             return res.status(500).json({ message: "Error fetching products" });
         }
 
-        // ✅ Ensure expiry_date is never null
+        // Ensure expiry_date is never null
         result.forEach(product => {
             if (!product.expiry_date) {
                 product.expiry_date = "Not Set";
@@ -26,8 +26,6 @@ router.get("/", (req, res) => {
 // Add Product (Admin Only)
 router.post("/add", (req, res) => {
     const { name, description, price, quantity } = req.body;
-
-    console.log("Received Product Data:", req.body); // ✅ Debugging log
 
     if (!name || !description || !price || !quantity) {
         console.error("Validation Failed: Missing Fields", { name, description, price, quantity });
