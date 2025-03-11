@@ -181,6 +181,5 @@ function showToast(message, type = "info") {
     }, 3000);
 }
 
-// Initial Data Load
 fetchProducts();
 fetchOrders();

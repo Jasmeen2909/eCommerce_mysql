@@ -67,7 +67,7 @@ async function placeOrder() {
     }
 }
 
-// Add showToast function to `checkout.js`
+
 function showToast(message, type = "info") {
     const toastContainer = document.getElementById("toast-container");
     if (!toastContainer) {

@@ -43,11 +43,6 @@ router.post("/add", (req, res) => {
     });
 });
 
-
-
-
-
-
 router.delete("/delete/:product_id", (req, res) => {
     const productId = req.params.product_id;
 

@@ -192,7 +192,6 @@ async function updateCart(productId, newQuantity) {
     }
 }
 
-
 // Remove Item from Cart
 async function removeFromCart(productId) {
     const userId = localStorage.getItem("user_id");
@@ -214,7 +213,6 @@ async function removeFromCart(productId) {
 }
 
 fetchProducts();
-
 
 //  Logout Function
 function logout() {

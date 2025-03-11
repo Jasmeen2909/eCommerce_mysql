@@ -65,8 +65,6 @@ router.get("/:user_id", (req, res) => {
 });
 
 
-
-
 router.post("/", (req, res) => {
     const { user_id, product_id, quantity } = req.body;
 
